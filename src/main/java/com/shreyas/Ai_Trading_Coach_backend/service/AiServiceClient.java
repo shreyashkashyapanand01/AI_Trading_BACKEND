@@ -6,8 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class AiServiceClient {
@@ -18,7 +16,7 @@ public class AiServiceClient {
         this.restTemplate = restTemplate;
     }
 
-    // 🔹 Stock Analysis
+    // Stock Analysis
     public StockResponse analyzeStock(String symbol) {
 
         String url = "http://localhost:8000/analyze-stock/" + symbol;
@@ -29,7 +27,7 @@ public class AiServiceClient {
         return response.getBody();
     }
 
-    // 🔹 Market Scan
+    // Market Scan
     public ScanResponse scanMarket() {
 
         String url = "http://localhost:8000/scan-market";

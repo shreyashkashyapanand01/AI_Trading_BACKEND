@@ -1,6 +1,5 @@
 package com.shreyas.Ai_Trading_Coach_backend.service;
 
-
 import com.shreyas.Ai_Trading_Coach_backend.dto.ScanResponse;
 import com.shreyas.Ai_Trading_Coach_backend.dto.StockResponse;
 import org.springframework.stereotype.Service;

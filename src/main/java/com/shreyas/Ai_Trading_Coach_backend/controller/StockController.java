@@ -1,7 +1,6 @@
 package com.shreyas.Ai_Trading_Coach_backend.controller;
 
-import com.shreyas.Ai_Trading_Coach_backend.dto.ScanResponse;
-import com.shreyas.Ai_Trading_Coach_backend.dto.StockResponse;
+import com.shreyas.Ai_Trading_Coach_backend.dto.response.StockResponse;
 import com.shreyas.Ai_Trading_Coach_backend.service.StockService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,9 +24,4 @@ public class StockController {
         return stockService.analyze(symbol);
     }
 
-    //  Scan market
-    @GetMapping("/scan")
-    public ScanResponse scanMarket() {
-        return stockService.scanMarket();
-    }
 }

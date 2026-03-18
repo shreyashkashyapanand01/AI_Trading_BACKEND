@@ -1,4 +1,4 @@
-package com.shreyas.Ai_Trading_Coach_backend.dto;
+package com.shreyas.Ai_Trading_Coach_backend.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

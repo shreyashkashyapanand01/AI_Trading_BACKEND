@@ -1,7 +1,7 @@
 package com.shreyas.Ai_Trading_Coach_backend.service;
 
-import com.shreyas.Ai_Trading_Coach_backend.dto.ScanResponse;
-import com.shreyas.Ai_Trading_Coach_backend.dto.StockResponse;
+import com.shreyas.Ai_Trading_Coach_backend.dto.response.ScanResponse;
+import com.shreyas.Ai_Trading_Coach_backend.dto.response.StockResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

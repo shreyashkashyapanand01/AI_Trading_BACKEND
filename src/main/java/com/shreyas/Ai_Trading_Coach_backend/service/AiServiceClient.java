@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.shreyas.Ai_Trading_Coach_backend.dto.response.TradeAnalysisResponse;
 
 @Service
 public class AiServiceClient {
@@ -34,6 +35,16 @@ public class AiServiceClient {
 
         ResponseEntity<ScanResponse> response =
                 restTemplate.getForEntity(url, ScanResponse.class);
+
+        return response.getBody();
+    }
+
+    public TradeAnalysisResponse analyzeTrades(Object request) {
+
+        String url = "http://localhost:8000/analyze-trades";
+
+        ResponseEntity<TradeAnalysisResponse> response =
+                restTemplate.postForEntity(url, request, TradeAnalysisResponse.class);
 
         return response.getBody();
     }

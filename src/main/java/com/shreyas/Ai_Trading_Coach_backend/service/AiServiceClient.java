@@ -1,5 +1,6 @@
 package com.shreyas.Ai_Trading_Coach_backend.service;
 
+import com.shreyas.Ai_Trading_Coach_backend.dto.response.PortfolioAnalysisResponse;
 import com.shreyas.Ai_Trading_Coach_backend.dto.response.ScanResponse;
 import com.shreyas.Ai_Trading_Coach_backend.dto.response.StockResponse;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,16 @@ public class AiServiceClient {
 
         ResponseEntity<TradeAnalysisResponse> response =
                 restTemplate.postForEntity(url, request, TradeAnalysisResponse.class);
+
+        return response.getBody();
+    }
+
+    public PortfolioAnalysisResponse analyzePortfolio(Object request) {
+
+        String url = "http://localhost:8000/portfolio-analyze";
+
+        ResponseEntity<PortfolioAnalysisResponse> response =
+                restTemplate.postForEntity(url, request, PortfolioAnalysisResponse.class);
 
         return response.getBody();
     }

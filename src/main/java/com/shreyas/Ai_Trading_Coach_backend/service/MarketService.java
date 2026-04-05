@@ -1,34 +1,29 @@
 package com.shreyas.Ai_Trading_Coach_backend.service;
 
-
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shreyas.Ai_Trading_Coach_backend.dto.request.TickerData;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.annotation.PostConstruct; // or javax.annotation.PostConstruct for older Spring
+//import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @EnableScheduling
+@Slf4j
 public class MarketService {
-    @Value("${alphavantage.api.key:demo}") // Uses your application.properties key
+    @Value("${alphavantage.api.key:demo}")
     private String API_KEY;
 
-    // Expanded list of Top 15 Indian Stocks
-    private final String[] SYMBOLS = {
-            "RELIANCE.BSE", "HDFCBANK.BSE", "INFY.BSE", "TCS.BSE",
-            "ICICIBANK.BSE", "SBIN.BSE", "BHARTIARTL.BSE", "ITC.BSE",
-            "HINDUNILVR.BSE", "LT.BSE", "BAJFINANCE.BSE", "AXISBANK.BSE",
-            "WIPRO.BSE", "KOTAKBANK.BSE", "TATAMOTORS.BSE"
-    };
+    @Value("${app.market.symbols}")
+    private List<String> SYMBOLS;
 
     // The memory cache for the React UI
     private final List<TickerData> cachedTickerData = new ArrayList<>();
@@ -42,15 +37,16 @@ public class MarketService {
         }
         return new ArrayList<>(cachedTickerData);
     }
-    // Runs once exactly every 6 Hours (6 hours * 60 min * 60 sec * 1000 ms = 21,600,000 ms)
+    // Runs every 6 Hours (fixedRate = 21600000 ms)
     @Scheduled(fixedRate = 21600000)
     public void fetchAllStocksEverySixHours() {
-        System.out.println("⏳ Starting 6-Hour Market Data Fetch Cycle...");
+        log.info("⏳ Starting 6-Hour Market Data Fetch Cycle...");
         for (String symbol : SYMBOLS) {
             try {
                 String url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey=" + API_KEY;
                 String response = restTemplate.getForObject(url, String.class);
                 JsonNode quote = objectMapper.readTree(response).path("Global Quote");
+                
                 if (!quote.isMissingNode() && quote.has("05. price")) {
                     BigDecimal price = new BigDecimal(quote.get("05. price").asText());
                     BigDecimal changePct = new BigDecimal(quote.get("10. change percent").asText().replace("%", ""));
@@ -62,18 +58,23 @@ public class MarketService {
                             isUp
                     );
                     updateCache(newData);
-                    System.out.println("✅ Successfully fetched: " + symbol);
+                    log.info("✅ Successfully fetched: {}", symbol);
                 } else {
-                    System.err.println("⚠️ Rate limit or invalid JSON for: " + symbol);
+                    log.warn("⚠️ Rate limit or invalid JSON for: {}. Response: {}", symbol, response);
                 }
-                // 🚨 CRITICAL: Wait 15 seconds before fetching the next stock.
-                // This ensures we NEVER hit the 5-requests-per-minute hard limit!
-                Thread.sleep(15000);
+                
+                // Still using a sleep to respect the free-tier API rate limits (5 calls/min)
+                // but wrapped in a slightly cleaner approach inside the loop.
+                Thread.sleep(15000); 
+            } catch (InterruptedException ie) {
+                log.error("❌ Yielding fetch cycle due to interruption");
+                Thread.currentThread().interrupt();
+                break;
             } catch (Exception e) {
-                System.err.println("❌ Network failed for " + symbol + ": " + e.getMessage());
+                log.error("❌ Network failed for {}: {}", symbol, e.getMessage());
             }
         }
-        System.out.println("✅ Finished 6-Hour Fetch Cycle! Cache is fully loaded.");
+        log.info("✅ Finished 6-Hour Fetch Cycle! Cache is fully loaded.");
     }
     private synchronized void updateCache(TickerData newData) {
         cachedTickerData.removeIf(t -> t.getSymbol().equals(newData.getSymbol()));

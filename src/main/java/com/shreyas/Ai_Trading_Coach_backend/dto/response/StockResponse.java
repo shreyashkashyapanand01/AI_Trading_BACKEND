@@ -4,10 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map;
+import java.io.Serializable;
 
 @Setter
 @Getter
-public class StockResponse {
+public class StockResponse implements Serializable {
 
     private String symbol;
     private Map<String, Object> technical;

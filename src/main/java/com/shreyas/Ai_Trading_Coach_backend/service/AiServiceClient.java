@@ -6,6 +6,7 @@ import com.shreyas.Ai_Trading_Coach_backend.dto.response.StockResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.cache.annotation.Cacheable;
 
 import com.shreyas.Ai_Trading_Coach_backend.dto.response.TradeAnalysisResponse;
 
@@ -19,6 +20,7 @@ public class AiServiceClient {
     }
 
     // Stock Analysis
+    @Cacheable(value = "stockAnalysis", key = "#symbol", unless = "#result == null")
     public StockResponse analyzeStock(String symbol) {
 
         String url = "http://localhost:8000/analyze-stock/" + symbol;
@@ -30,6 +32,7 @@ public class AiServiceClient {
     }
 
     // Market Scan
+    @Cacheable(value = "marketScan", unless = "#result == null")
     public ScanResponse scanMarket() {
 
         String url = "http://localhost:8000/scan-market";

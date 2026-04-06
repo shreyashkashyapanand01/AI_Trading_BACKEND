@@ -6,10 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.io.Serializable;
 
 @Setter
 @Getter
-public class ScanResponse {
+public class ScanResponse implements Serializable {
 
     private List<Opportunity> opportunities;
 
